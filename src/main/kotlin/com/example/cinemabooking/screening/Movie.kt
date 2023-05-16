@@ -1,4 +1,4 @@
-package com.example.cinemabooking
+package com.example.cinemabooking.screening
 
 import jakarta.persistence.*
 
@@ -9,6 +9,6 @@ class Movie(
     @Column(nullable = false)
     val duration: Int,
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    val movieId: Long? = null
+    @GeneratedValue
+    val movieId: Int? = null
 )

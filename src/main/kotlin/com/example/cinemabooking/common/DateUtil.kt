@@ -1,4 +1,4 @@
-package com.example.cinemabooking
+package com.example.cinemabooking.common
 
 import java.time.Instant
 import java.time.LocalDateTime
