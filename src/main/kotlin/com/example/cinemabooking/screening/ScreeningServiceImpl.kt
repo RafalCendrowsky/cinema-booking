@@ -3,18 +3,16 @@ package com.example.cinemabooking.screening
 import com.example.cinemabooking.booking.*
 import com.example.cinemabooking.common.toEpochMilli
 import jakarta.transaction.Transactional
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
 @Service
-class ScreeningServiceImpl(private val bookingRepository: BookingRepository) : ScreeningService {
-    @Autowired
-    lateinit var screeningRepository: ScreeningRepository
-
-    @Autowired
-    lateinit var ticketRepository: TicketRepository
-
+class ScreeningServiceImpl(
+    private val bookingRepository: BookingRepository,
+    private val screeningRepository: ScreeningRepository,
+    private val ticketRepository: TicketRepository,
+    private val ticketTypeRepository: TicketTypeRepository
+) : ScreeningService {
     override fun getAllInInterval(from: LocalDateTime, to: LocalDateTime): List<MovieScreeningView> =
             screeningRepository.getAllInInterval(from.toEpochMilli(), to.toEpochMilli())
                     .groupBy { it.movie }
@@ -33,17 +31,14 @@ class ScreeningServiceImpl(private val bookingRepository: BookingRepository) : S
                             booking,
                             s.room.rows.first { r -> r.rowNumber == it.row },
                             it.seat,
-                            it.type) }
-                    ticketRepository.saveAll(tickets)
-                    BookingResponse(booking.bookingId ?: -1, tickets.sumOf { it.price() } / 100)
+                            TicketTypeEnum.fromName(it.type)!!.toEntity())
+                    }.let { ticketRepository.saveAll(it) }
+                    val prices = ticketTypeRepository.findAllById(tickets.map { it.type.typeId })
+                            .associate { it.typeId to it.price }
+                    BookingResponse(
+                            booking.bookingId ?: -1,
+                            tickets.sumOf { prices[it.type.typeId] ?: 0 } / 100)
                 }
-
-    private fun Ticket.price() = when (type) {
-        "adult" -> 2500
-        "student" -> 1800
-        "child" -> 1250
-        else -> 0
-    }
 
     private fun validateBookingRequest(screening: Screening, request: BookingRequest): Boolean {
         val seatCounts = screening.room.rows.associate { it.rowNumber to it.seatCount }
@@ -61,17 +56,15 @@ class ScreeningServiceImpl(private val bookingRepository: BookingRepository) : S
         seats.sorted().forEachIndexed { index, seat ->
                 if ((seat > seatCount) ||
                         // there's a gap at the start
-                        (index == 0 && seat == 1) ||
+                        (index == 0 && seat == 2) ||
                         // there is a singular gap between seats
-                        (index != 0 && seat - seats[index - 1] == 1) ||
+                        (index != 0 && seat - seats[index - 1] == 2) ||
                         // there's a gap at the end
                         (index == seats.size - 1 && seat == seatCount - 1)
                     )  return@checkIsRowValid false
         }
         return true
     }
-
-
 
     private fun getSeatsTaken(screeningId: Int) = ticketRepository.findTicketsForScreening(screeningId)
             .groupBy({ it.row.rowNumber }, { it.seatNumber })

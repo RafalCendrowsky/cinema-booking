@@ -11,6 +11,6 @@ class Booking (
     @Column(nullable = false)
     val name: String,
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val bookingId: Int? = null,
 )

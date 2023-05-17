@@ -9,6 +9,6 @@ class Movie(
     @Column(nullable = false)
     val duration: Int,
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val movieId: Int? = null
 )

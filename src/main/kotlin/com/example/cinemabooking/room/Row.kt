@@ -12,6 +12,6 @@ class Row (
     @JoinColumn(name = "room_number", nullable = false)
     val room: Room,
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val rowId: Int? = null,
 )

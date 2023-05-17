@@ -8,14 +8,15 @@ class Ticket (
     @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(name = "booking_id")
     val booking: Booking,
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "row_id")
     val row: Row,
     @Column(nullable = false)
     val seatNumber: Int,
-    @Column(nullable = false)
-    val type: String,
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "type_id")
+    val type: TicketType,
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val ticketId: Int? = null,
 )

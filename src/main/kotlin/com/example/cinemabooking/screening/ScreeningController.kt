@@ -3,7 +3,6 @@ package com.example.cinemabooking.screening
 import com.example.cinemabooking.booking.BookingRequest
 import com.example.cinemabooking.booking.BookingResponse
 import jakarta.validation.Valid
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -17,11 +16,9 @@ import java.time.LocalDateTime
 
 @RestController
 @RequestMapping("/screenings")
-class ScreeningController {
-
-    @Autowired
-    lateinit var screeningService: ScreeningService
-
+class ScreeningController(
+    val screeningService: ScreeningService
+) {
     @GetMapping
     fun getAllScreeningsInPeriod(
         @RequestParam("startDate") startDate: LocalDateTime,
