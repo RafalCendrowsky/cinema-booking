@@ -5,7 +5,7 @@ import jakarta.persistence.*
 
 @Entity
 class Ticket (
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(name = "booking_id")
     val booking: Booking,
     @ManyToOne(optional = false)

@@ -1,11 +1,14 @@
 package com.example.cinemabooking.screening
 
-import com.example.cinemabooking.booking.TicketRepository
-import com.example.cinemabooking.common.toEpochMilli
+import com.example.cinemabooking.booking.BookingRequest
+import com.example.cinemabooking.booking.BookingResponse
+import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -17,28 +20,25 @@ import java.time.LocalDateTime
 class ScreeningController {
 
     @Autowired
-    lateinit var screeningRepository: ScreeningRepository
-    @Autowired
-    lateinit var ticketRepository: TicketRepository
+    lateinit var screeningService: ScreeningService
 
     @GetMapping
-    fun getAllScreenings(
+    fun getAllScreeningsInPeriod(
         @RequestParam("startDate") startDate: LocalDateTime,
         @RequestParam("endDate") endDate: LocalDateTime
-    ): List<MovieView> {
-        val startDateAdjusted = if (startDate.isAfter(LocalDateTime.now())) startDate else LocalDateTime.now()
-        return screeningRepository.getAllInInterval(startDateAdjusted.toEpochMilli(), endDate.toEpochMilli())
-                .groupBy { it.movie }
-                .map { (movie, screenings) -> movie.toPreview(screenings) }
-    }
+    ): List<MovieScreeningView> = screeningService.getAllInInterval(startDate, endDate)
 
     @GetMapping("/{screeningId}")
-    fun getScreening(@PathVariable("screeningId") screeningId: Int): ScreeningView {
-        val seatsTaken = ticketRepository.findTicketsForScreening(screeningId)
-                .groupBy { it.row.rowNumber }
-                .mapValues { (_, tickets) -> tickets.map { it.seatNumber }.toSet() }
+    fun getScreening(@PathVariable("screeningId") screeningId: Int): ScreeningView =
+            screeningService.findById(screeningId) ?:
+                throw ResponseStatusException(HttpStatus.NOT_FOUND, "Screening not found")
 
-        return screeningRepository.findById(screeningId).map { s -> s.toView(seatsTaken) }
-                .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "Screening not found") }
-    }
+    @PostMapping("/{screeningId}/book")
+    fun bookScreening(
+        @PathVariable("screeningId") screeningId: Int,
+        @Valid @RequestBody request: BookingRequest
+    ): BookingResponse = screeningService.bookScreening(screeningId, request) ?:
+        throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid booking request")
+
+
 }

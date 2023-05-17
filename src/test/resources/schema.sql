@@ -26,18 +26,18 @@ create table row(
 );
 
 create table booking(
-    booking_id serial primary key,
-    screening_id int not null,
-    name         varchar(100) not null,
-    foreign key (screening_id) references screening(screening_id)
+     booking_id serial primary key,
+     screening_id int not null,
+     name         varchar(100) not null,
+     foreign key (screening_id) references screening(screening_id)
 );
 
 create table ticket(
-    ticket_id serial primary key,
-    booking_id  int not null,
-    row_id      int not null,
-    seat_number int not null,
-    type        varchar(15) not null,
-    foreign key (booking_id) references booking(booking_id),
-    foreign key (row_id) references row(row_id)
+     ticket_id serial primary key,
+     booking_id  int not null,
+     row_id      int not null,
+     seat_number int not null,
+     type        varchar(15) not null,
+     foreign key (booking_id) references booking(booking_id),
+     foreign key (row_id) references row(row_id)
 )

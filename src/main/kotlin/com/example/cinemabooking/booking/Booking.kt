@@ -5,11 +5,11 @@ import jakarta.persistence.*
 
 @Entity
 class Booking (
-    @OneToMany(mappedBy = "booking", cascade = [CascadeType.ALL])
-    val tickets: List<Ticket>,
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "screening_id")
     val screening: Screening,
+    @Column(nullable = false)
+    val name: String,
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     val bookingId: Int? = null,

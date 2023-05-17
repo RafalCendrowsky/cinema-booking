@@ -15,7 +15,7 @@ data class ScreeningView(
     val id: Int
 )
 
-fun Screening.toPreview() = ScreeningPreview(formatEpochMilli(startTime), screeningId ?: -1)
+fun Screening.toView() = ScreeningPreview(formatEpochMilli(startTime), screeningId ?: -1)
 
 fun Screening.toView(seatsTaken: Map<Int, Set<Int>>) =
         ScreeningView(formatEpochMilli(startTime), room.toView(seatsTaken), screeningId ?: -1)

@@ -155,12 +155,12 @@ insert into screening(screening_id, movie_id, start_time, room_number) values
     (100, 9, extract(epoch from '2023-05-13T20:40:00'::timestamp)*1000, 4);
 
 
-insert into booking(booking_id, screening_id) values
-    (1, 1),
-    (2, 1),
-    (3, 5),
-    (4, 20),
-    (5, 79);
+insert into booking(booking_id, screening_id, name) values
+    (1, 1, 'John Doe'),
+    (2, 1, 'Jane Doe'),
+    (3, 5, 'Alice Smith'),
+    (4, 20, 'Anna Pawlikowska-Jasnorzębska'),
+    (5, 79, 'Jan Kowalski');
 
 insert into ticket(ticket_id, booking_id, row_id, seat_number, type) values
     (1, 1, 5, 1, 'adult'),
