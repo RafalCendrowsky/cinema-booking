@@ -16,7 +16,7 @@ insert into room(room_number) values
     (4),
     (5);
 
-insert into row(room_number, row_number, seat_count) values
+insert into seat_row(room_number, row_number, seat_count) values
 /* 1 */    (1, 1, 8),
 /* 2 */    (1, 2, 10),
 /* 3 */    (1, 3, 12),

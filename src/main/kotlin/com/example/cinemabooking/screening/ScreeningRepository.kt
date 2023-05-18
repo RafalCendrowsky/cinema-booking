@@ -13,7 +13,7 @@ interface ScreeningRepository : JpaRepository<Screening, Int> {
 
     @Query("select s from Screening s " +
             "join fetch s.room r " +
-            "join fetch r.rows rs " +
+            "join fetch r.seatRows rs " +
             "where s.screeningId = :screeningId")
     fun findByIdWithRefs(screeningId: Int): Screening?
 }

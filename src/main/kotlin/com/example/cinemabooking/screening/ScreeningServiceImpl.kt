@@ -1,7 +1,11 @@
 package com.example.cinemabooking.screening
 
-import com.example.cinemabooking.booking.*
+import com.example.cinemabooking.booking.Booking
+import com.example.cinemabooking.booking.BookingRepository
+import com.example.cinemabooking.booking.BookingRequest
+import com.example.cinemabooking.booking.BookingResponse
 import com.example.cinemabooking.common.toEpochMilli
+import com.example.cinemabooking.ticket.*
 import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -22,51 +26,64 @@ class ScreeningServiceImpl(
             screeningRepository.findByIdWithRefs(screeningId)?.toView(getSeatsTaken(screeningId))
 
     @Transactional
-    override fun bookScreening(screeningId: Int, request: BookingRequest): BookingResponse? =
-            screeningRepository.findByIdWithRefs(screeningId)
-                ?.takeIf { validateBookingRequest(it, request) }
-                ?.let { s ->
-                    val booking = bookingRepository.save(Booking(s, "${request.name} ${request.surname}"))
-                    val tickets = request.seats.map { Ticket(
+    override fun bookScreening(
+        screeningId: Int,
+        request: BookingRequest,
+        bookingTime: LocalDateTime
+    ): BookingResponse? = screeningRepository.findByIdWithRefs(screeningId)
+            ?.takeIf { validateBookingRequest(it, request, bookingTime) }
+            ?.let { s ->
+                val booking = bookingRepository.save(Booking(s, "${request.name} ${request.surname}"))
+                val tickets = request.seats.map {
+                    Ticket(
                             booking,
-                            s.room.rows.first { r -> r.rowNumber == it.row },
+                            s.room.seatRows.first { r -> r.rowNumber == it.row },
                             it.seat,
                             TicketTypeEnum.fromName(it.type)!!.toEntity())
-                    }.let { ticketRepository.saveAll(it) }
-                    val prices = ticketTypeRepository.findAllById(tickets.map { it.type.typeId })
-                            .associate { it.typeId to it.price }
-                    BookingResponse(
-                            booking.bookingId ?: -1,
-                            tickets.sumOf { prices[it.type.typeId] ?: 0 } / 100)
-                }
+                }.let { ticketRepository.saveAll(it) }
+                val prices = ticketTypeRepository.findAllById(tickets.map { it.type.typeId })
+                        .associate { it.typeId to it.price }
+                BookingResponse(
+                        booking.bookingId ?: -1,
+                        tickets.sumOf { prices[it.type.typeId] ?: 0 } / 100.0)
+            }
 
-    private fun validateBookingRequest(screening: Screening, request: BookingRequest): Boolean {
-        val seatCounts = screening.room.rows.associate { it.rowNumber to it.seatCount }
-        val seatsTaken = getSeatsTaken(screening.screeningId ?: -1)
-        return request.seats
-                .groupBy({ it.row }, { it.seat })
-                .map { (row, seats) -> checkIsRowValid(
-                        seats + (seatsTaken[row] ?: emptySet()),
-                        seatCounts[row] ?: 0
-                ) }
-                .reduce(Boolean::and)
+    private fun validateBookingRequest(
+        screening: Screening,
+        request: BookingRequest,
+        bookingTime: LocalDateTime
+    ): Boolean {
+        val seatCounts = screening.room.seatRows.associate { it.rowNumber to it.seatCount }
+        val seatsTaken = getSeatsTaken(screening.screeningId)
+        return (screening.startTime > bookingTime.plusMinutes(15).toEpochMilli()) &&
+                request.seats
+                        .groupBy({ it.row }, { it.seat })
+                        .map { (row, seats) ->
+                            checkIsRowValid(
+                                    seats + (seatsTaken[row] ?: emptySet()),
+                                    seatCounts[row] ?: 0)
+                        }
+                        .reduce(Boolean::and)
     }
 
     private fun checkIsRowValid(seats: List<Int>, seatCount: Int): Boolean {
-        seats.sorted().forEachIndexed { index, seat ->
+        seats.sorted().let {
+            it.forEachIndexed { index, seat ->
                 if ((seat > seatCount) ||
                         // there's a gap at the start
                         (index == 0 && seat == 2) ||
                         // there is a singular gap between seats
-                        (index != 0 && seat - seats[index - 1] == 2) ||
+                        (index != 0 && seat - it[index - 1] == 2) ||
                         // there's a gap at the end
                         (index == seats.size - 1 && seat == seatCount - 1)
-                    )  return@checkIsRowValid false
+                ) return@checkIsRowValid false
+            }
+            return true
         }
-        return true
     }
 
-    private fun getSeatsTaken(screeningId: Int) = ticketRepository.findTicketsForScreening(screeningId)
-            .groupBy({ it.row.rowNumber }, { it.seatNumber })
-            .mapValues { (_, seats) -> seats.toMutableSet() }
+    private fun getSeatsTaken(screeningId: Int): Map<Int, Set<Int>> =
+            ticketRepository.findTicketsForScreening(screeningId)
+                    .groupBy({ it.seatRow.rowNumber }, { it.seatNumber })
+                    .mapValues { (_, seats) -> seats.toSet() }
 }

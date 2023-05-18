@@ -1,4 +1,4 @@
-package com.example.cinemabooking.booking
+package com.example.cinemabooking.ticket
 
 enum class TicketTypeEnum(val id: Int, val typeName: String) {
     ADULT(1, "adult"),

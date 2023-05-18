@@ -5,7 +5,7 @@ data class RowView (
     val rowNumber: Int,
 )
 
-fun Row.toView(seatsTaken: Set<Int>) = RowView(
+fun SeatRow.toView(seatsTaken: Set<Int>) = RowView(
         (1..seatCount).filter { !seatsTaken.contains(it) },
         rowNumber
 )

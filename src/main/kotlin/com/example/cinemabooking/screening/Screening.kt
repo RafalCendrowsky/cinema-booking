@@ -14,6 +14,5 @@ class Screening(
     @JoinColumn(name = "room_number", nullable = false)
     val room: Room,
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val screeningId: Int? = null
+    val screeningId: Int
 )

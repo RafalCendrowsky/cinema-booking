@@ -6,6 +6,6 @@ data class RoomView (
 )
 
 fun Room.toView(seatsTaken: Map<Int, Set<Int>>) = RoomView(
-        rows.map { it.toView(seatsTaken[it.rowNumber] ?: emptySet()) },
+        seatRows.map { it.toView(seatsTaken[it.rowNumber] ?: emptySet()) },
         roomNumber
 )

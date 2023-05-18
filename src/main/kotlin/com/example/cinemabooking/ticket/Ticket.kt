@@ -1,16 +1,17 @@
-package com.example.cinemabooking.booking
+package com.example.cinemabooking.ticket
 
-import com.example.cinemabooking.room.Row
+import com.example.cinemabooking.booking.Booking
+import com.example.cinemabooking.room.SeatRow
 import jakarta.persistence.*
 
 @Entity
-class Ticket (
+class Ticket(
     @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(name = "booking_id")
     val booking: Booking,
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "row_id")
-    val row: Row,
+    val seatRow: SeatRow,
     @Column(nullable = false)
     val seatNumber: Int,
     @ManyToOne(optional = false, fetch = FetchType.LAZY)

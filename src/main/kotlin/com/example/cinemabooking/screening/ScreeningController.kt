@@ -4,13 +4,7 @@ import com.example.cinemabooking.booking.BookingRequest
 import com.example.cinemabooking.booking.BookingResponse
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDateTime
 
@@ -34,8 +28,8 @@ class ScreeningController(
     fun bookScreening(
         @PathVariable("screeningId") screeningId: Int,
         @Valid @RequestBody request: BookingRequest
-    ): BookingResponse = screeningService.bookScreening(screeningId, request) ?:
-        throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid booking request")
+    ): BookingResponse = screeningService.bookScreening(screeningId, request, LocalDateTime.now())
+            ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid booking request")
 
 
 }

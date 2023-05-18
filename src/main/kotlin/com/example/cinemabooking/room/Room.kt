@@ -7,7 +7,7 @@ import jakarta.persistence.OneToMany
 @Entity
 class Room (
     @OneToMany(mappedBy = "room")
-    val rows: List<Row>,
+    val seatRows: List<SeatRow>,
     @Id
     val roomNumber: Int,
 )

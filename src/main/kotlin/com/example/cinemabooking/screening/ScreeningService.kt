@@ -8,6 +8,6 @@ interface ScreeningService {
     fun getAllInInterval(from: LocalDateTime, to: LocalDateTime): List<MovieScreeningView>
 
     fun findById(screeningId: Int): ScreeningView?
-
-    fun bookScreening(screeningId: Int, request: BookingRequest): BookingResponse?
+    
+    fun bookScreening(screeningId: Int, request: BookingRequest, bookingTime: LocalDateTime): BookingResponse?
 }

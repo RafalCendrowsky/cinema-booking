@@ -1,4 +1,4 @@
-package com.example.cinemabooking.booking
+package com.example.cinemabooking.ticket
 
 import org.springframework.data.jpa.repository.JpaRepository
 

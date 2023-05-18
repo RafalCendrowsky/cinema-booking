@@ -1,11 +1,11 @@
-package com.example.cinemabooking.booking
+package com.example.cinemabooking.ticket
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 
 @Entity
-class TicketType (
+class TicketType(
     @Column(nullable = false)
     val name: String,
     @Id
