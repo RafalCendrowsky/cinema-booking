@@ -23,14 +23,14 @@ class ScreeningServiceImpl(
                     .map { (movie, screenings) -> movie.toView(screenings) }
 
     override fun findById(screeningId: Int): ScreeningView? =
-            screeningRepository.findByIdWithRefs(screeningId)?.toView(getSeatsTaken(screeningId))
+            screeningRepository.findByIdWithRoom(screeningId)?.toView(getSeatsTaken(screeningId))
 
     @Transactional
     override fun bookScreening(
         screeningId: Int,
         request: BookingRequest,
         bookingTime: LocalDateTime
-    ): BookingResponse? = screeningRepository.findByIdWithRefs(screeningId)
+    ): BookingResponse? = screeningRepository.findByIdWithRoom(screeningId)
             ?.takeIf { validateBookingRequest(it, request, bookingTime) }
             ?.let { s ->
                 val booking = bookingRepository.save(Booking(s, "${request.name} ${request.surname}"))
@@ -69,14 +69,8 @@ class ScreeningServiceImpl(
     private fun checkIsRowValid(seats: List<Int>, seatCount: Int): Boolean {
         seats.sorted().let {
             it.forEachIndexed { index, seat ->
-                if ((seat > seatCount) ||
-                        // there's a gap at the start
-                        (index == 0 && seat == 2) ||
-                        // there is a singular gap between seats
-                        (index != 0 && seat - it[index - 1] == 2) ||
-                        // there's a gap at the end
-                        (index == seats.size - 1 && seat == seatCount - 1)
-                ) return@checkIsRowValid false
+                if ((seat > seatCount) || (index != 0 && (seat - it[index - 1]) in listOf(0, 2)))
+                    return@checkIsRowValid false
             }
             return true
         }

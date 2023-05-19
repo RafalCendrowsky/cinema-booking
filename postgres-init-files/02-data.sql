@@ -152,7 +152,8 @@ insert into screening(movie_id, start_time, room_number) values
 /* 97 */   (9, extract(epoch from '2023-05-13T13:00:00'::timestamp)*1000, 4),
 /* 98 */   (9, extract(epoch from '2023-05-13T15:40:00'::timestamp)*1000, 4),
 /* 99 */   (9, extract(epoch from '2023-05-13T18:20:00'::timestamp)*1000, 4),
-/* 100 */  (9, extract(epoch from '2023-05-13T20:40:00'::timestamp)*1000, 4);
+/* 100 */  (9, extract(epoch from '2023-05-13T20:40:00'::timestamp)*1000, 4),
+/* 101 */  (9, extract(epoch from '2123-05-13T20:40:00'::timestamp)*1000, 4);
 
 
 insert into booking(screening_id, name) values

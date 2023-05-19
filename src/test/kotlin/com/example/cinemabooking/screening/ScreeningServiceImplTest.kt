@@ -43,7 +43,7 @@ class ScreeningServiceImplTest {
     }
 
     @Test
-    fun `Test valid booking request`() {
+    fun `Test with valid booking request`() {
         // WHEN
         val response = screeningService.bookScreening(SCREENING_ID, request, epoch)
 
@@ -53,18 +53,70 @@ class ScreeningServiceImplTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = [1, 2, 5])
+    @ValueSource(ints = [1, 5])
     fun `Test booking with seat gap`(seat: Int) {
         // WHEN
         val response = screeningService.bookScreening(
                 SCREENING_ID,
                 request.copy(seats = listOf(
-                        BookingSeat(1, 3, "adult"),
-                        BookingSeat(1, seat, "adult")
+                        BookingSeat(1, 3, ADULT_TYPE),
+                        BookingSeat(1, seat, ADULT_TYPE)
                 )),
                 epoch
         )
 
+
+        // THEN
+        assertNull(response)
+    }
+
+    @Test
+    fun `Test booking with date out of range`() {
+        // WHEN
+        val response = screeningService.bookScreening(
+                SCREENING_ID,
+                request,
+                epoch.withYear(YEAR_OUT_OF_RANGE)
+        )
+
+        // THEN
+        assertNull(response)
+    }
+
+    @Test
+    fun `Test booking with a seat number out of range`() {
+        // WHEN
+        val response = screeningService.bookScreening(
+                SCREENING_ID,
+                request.copy(seats = listOf(BookingSeat(1, 100, ADULT_TYPE))),
+                epoch
+        )
+
+        // THEN
+        assertNull(response)
+    }
+
+    @Test
+    fun `Test booking with a row number out of range`() {
+        // WHEN
+        val response = screeningService.bookScreening(
+                SCREENING_ID,
+                request.copy(seats = listOf(BookingSeat(100, 1, ADULT_TYPE))),
+                epoch
+        )
+
+        // THEN
+        assertNull(response)
+    }
+
+    @Test
+    fun `Test booking with an already taken seat`() {
+        // WHEN
+        val response = screeningService.bookScreening(
+                SCREENING_ID,
+                request.copy(seats = listOf(BookingSeat(ROW_TAKEN, SEAT_TAKEN, ADULT_TYPE))),
+                epoch
+        )
 
         // THEN
         assertNull(response)

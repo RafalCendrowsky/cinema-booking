@@ -9,7 +9,15 @@ const val SCREENING_ID = 1
 
 const val EXPECTED_PRICE = 37.5
 
-val epoch = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.UTC)
+const val YEAR_OUT_OF_RANGE = 2123
+
+const val ROW_TAKEN = 2
+
+const val SEAT_TAKEN = 1
+
+const val ADULT_TYPE = "adult"
+
+val epoch: LocalDateTime = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.UTC)
 
 val request = BookingRequest(
         "John",
