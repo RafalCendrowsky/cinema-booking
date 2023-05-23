@@ -34,6 +34,10 @@ allOpen {
 	annotation("jakarta.persistence.Embeddable")
 }
 
+tasks.getByName<Jar>("jar") {
+	enabled = false
+}
+
 tasks.withType<KotlinCompile> {
 	kotlinOptions {
 		freeCompilerArgs = listOf("-Xjsr305=strict")
